@@ -1,0 +1,18 @@
+model:
+    arch: coco_unet
+data:
+    training:
+        dataset_dir: '/dataset/coco/train/input'
+        index_file: '/dataset/coco/train/index_file.txt'
+        labels_dir: '/dataset/coco/train/output'
+    validation:
+        dataset_dir: '/dataset/coco/train/input'
+        index_file: '/dataset/coco/train/index_file.txt'
+        labels_dir: '/dataset/coco/train/output'
+    test:
+        dataset_dir: '/dataset/coco/test/input'
+        index_file: '/dataset/coco/test/index_file.txt'
+        labels_dir: '/dataset/coco/test/output'
+
+training:
+    batch_size: 40
