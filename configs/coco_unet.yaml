@@ -13,6 +13,9 @@ data:
         dataset_dir: '/dataset/coco/test/input'
         index_file: '/dataset/coco/test/index_file.txt'
         labels_dir: '/dataset/coco/test/output'
+    
+    classes:
+        index_file: '/dataset/coco/classes.json'
 
 training:
     batch_size: 40
