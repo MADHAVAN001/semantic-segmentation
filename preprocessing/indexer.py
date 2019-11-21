@@ -36,6 +36,7 @@ def main():
         cfg = yaml.load(fp)
 
     index_dataset(cfg, "train")
+    index_dataset(cfg, "validation")
     index_dataset(cfg, "test")
 
 
