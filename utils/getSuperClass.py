@@ -27,3 +27,7 @@ def getSuperClass(path):
     #TODO: Run regeneration of mask and then remove below line 
     final_list_supercat = ['background', 'appliance', 'electronic', 'accessory', 'kitchen', 'sports', 'vehicle', 'furniture', 'food', 'outdoor', 'indoor', 'animal', 'person']
     return final_list_supercat
+
+'''
+getSuperClass("/home/shravan/classMaps.json")
+'''
