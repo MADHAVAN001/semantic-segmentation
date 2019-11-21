@@ -19,3 +19,6 @@ data:
 
 training:
     batch_size: 40
+validate:
+    batch_size: 40
+
