@@ -32,6 +32,6 @@ class CocoDataGenerator(Sequence):
 
             for line in result:
                 batch_images.append(cv2.imread(os.path.join(self.dataset_dir, line.strip())))
-                batch_labels.append(np.load(os.path.join(self.dataset_dir, line.strip()+".npy")))
+                batch_labels.append(np.load(os.path.join(self.labels_dir, line.strip()+".npy")))
 
         return np.array(batch_images), np.array(batch_labels)
