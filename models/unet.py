@@ -32,8 +32,13 @@ class uNetModel:
         self.model = self.get_unet(input_img, n_filters=n_filters, ksize = kernel_size, dropout=dropout, batchnorm=batchnorm, numClasses=numClasses)
     
     def argmax_op(self, input):
-        return(tf.keras.backend.argmax(input,-1))
+        return(tf.keras.backend.cast(tf.keras.backend.argmax(input,-1),'float64'))
 
+    def softargmax(self, x, beta=1e3):
+        #x = tf.convert_to_tensor(x)
+        x_range = tf.range(x.shape.as_list()[-1], dtype=x.dtype)
+        return tf.reduce_sum(tf.nn.softmax(x*beta) * x_range, axis=-1)
+    
     def conv2d_block(self, input_tensor, n_filters, kernel_size, batchnorm):
         # first layer
         x = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
@@ -93,7 +98,8 @@ class uNetModel:
     
         outputs = Conv2D(numClasses, (1, 1), activation='sigmoid') (c9)
         
-        outputs = Lambda(self.argmax_op)(outputs)
+        #outputs = Lambda(self.argmax_op)(outputs)
+        outputs = Lambda(self.softargmax)(outputs)
         model = Model(inputs=[input_img], outputs=[outputs])
         return model
 
