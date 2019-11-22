@@ -33,7 +33,9 @@ class CocoDataGenerator(Sequence):
 
             for line in result:
                 batch_images.append(cv2.imread(os.path.join(self.dataset_dir, line.strip())))
-                batch_labels.append(np.load(os.path.join(self.labels_dir, line.strip()+".npy")))
+                label_mat= np.load(os.path.join(self.labels_dir, line.strip()+".npy"))
+                label_mat = label_mat.reshape(label_mat.shape[0],label_mat.shape[1],1)
+                batch_labels.append(label_mat)
 
         return np.array(batch_images), np.array(batch_labels)
 
@@ -67,5 +69,4 @@ def get_super_class(cfg):
     #TODO: Run regeneration of mask and then remove below line
     final_list_supercat = ['background', 'appliance', 'electronic', 'accessory', 'kitchen', 'sports', 'vehicle', 'furniture', 'food', 'outdoor', 'indoor', 'animal', 'person']
     return final_list_supercat
-
 
