@@ -64,9 +64,9 @@ def get_super_class(cfg):
         class_superclass_map_id[data[x]['id']] = supercat
     final_list_supercat = list(supercat_names.keys())
     final_list_supercat.sort()
-    idxBG = final_list_supercat.index('background')
-    tmp = final_list_supercat[idxBG]
-    final_list_supercat[idxBG] = final_list_supercat[0]
+    idx_bg = final_list_supercat.index('background')
+    tmp = final_list_supercat[idx_bg]
+    final_list_supercat[idx_bg] = final_list_supercat[0]
     final_list_supercat[0] = tmp
     #Override for now due to bug in code to generate mask. Once fixed, below line can be removed
     #TODO: Run regeneration of mask and then remove below line
