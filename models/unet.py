@@ -98,8 +98,6 @@ class uNetModel:
     
         outputs = Conv2D(numClasses, (1, 1), activation='sigmoid') (c9)
         
-        #outputs = Lambda(self.argmax_op)(outputs)
-        outputs = Lambda(self.softargmax)(outputs)
         model = Model(inputs=[input_img], outputs=[outputs])
         return model
 
