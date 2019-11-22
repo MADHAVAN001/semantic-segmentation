@@ -19,9 +19,13 @@ class CocoDataGenerator(Sequence):
         self.index_file = cfg["data"][fetch_prefix]["index_file"]
         self.dataset_dir = cfg["data"][fetch_prefix]["dataset_dir"]
         self.labels_dir = cfg["data"][fetch_prefix]["labels_dir"]
+        self.image_width = cfg["data"]["dimensions"]["img_width"]
+        self.image_height = cfg["data"]["dimensions"]["img_height"]
+        self.image_num_chans = cfg["data"]["dimensions"]["img_num_chans"]
+        self.num_images = file_line_count(self.index_file)
 
     def __len__(self):
-        return int(np.ceil(file_line_count(self.index_file)/float(self.batch_size)))
+        return int(np.ceil(self.num_images/float(self.batch_size)))
 
     def __getitem__(self, idx):
 
@@ -38,7 +42,6 @@ class CocoDataGenerator(Sequence):
                 batch_labels.append(label_mat)
 
         return np.array(batch_images), np.array(batch_labels)
-
 
 def get_super_class(cfg):
     path = cfg["data"]["classes"]["index_file"]
@@ -70,3 +73,13 @@ def get_super_class(cfg):
     final_list_supercat = ['background', 'appliance', 'electronic', 'accessory', 'kitchen', 'sports', 'vehicle', 'furniture', 'food', 'outdoor', 'indoor', 'animal', 'person']
     return final_list_supercat
 
+def get_model_hyperparams(cfg):
+    n_epochs = cfg["training"]["num_epochs"]
+    n_filters = cfg["training"]["num_filters"]
+    dropout = cfg["training"]["dropout"]
+    kernel_size = cfg["training"]["kernel_size"]
+    batch_norm = cfg["training"]["batch_norm"]
+    return n_epochs, n_filters, dropout, kernel_size, batch_norm
+
+def get_model_check_path(cfg):
+    return cfg["training"]["model_check_path"]
