@@ -7,6 +7,7 @@ import numpy as np
 import scipy.misc
 import os
 import math
+import cv2
 
 fp = open("configs/coco_unet.yaml")
 cfg = yaml.load(fp)
@@ -37,10 +38,12 @@ unet_inst.model.compile(optimizer = Adam(), loss = "sparse_categorical_crossentr
 train = False
 inference = True
 eval_validation = False
-use_test = True
-num_inference = 20
+use_test = False
+start_inference = 0
+end_inference = 50
 path_infer_store = "./predict/"
 scale_factor = math.floor((255.0 / num_classes))
+enable_debug = 0
 
 if train:
     callbacks = [
@@ -60,21 +63,33 @@ if inference:
     else:
         dataset_use = data_gen_valid
     
-    path_fetch = dataset_use.labels_dir
-    path_fetch = path_fetch  + "/"
+    path_fetch_output = dataset_use.labels_dir
+    path_fetch_output = path_fetch_output  + "/"
+    path_fetch_input = dataset_use.dataset_dir + "/"
 
-    files = os.listdir(path_fetch)
-    files = files[0:num_inference]
+    files_input = os.listdir(path_fetch_input)
+    files_input = files_input[start_inference:end_inference]
 
     if eval_validation:
         unet_inst.model.evaluate(data_gen_valid, verbose = 1)
 
-    predictions = unet_inst.model.predict(dataset_use, verbose = 1)
-    predictions = np.argmax(predictions, -1)
-
-    for x in range(num_inference):
-        true_mask = np.load(path_fetch+files[x])
-        prediction_inst = predictions[x,:,:] * scale_factor
+    for x in range(start_inference,end_inference,1):
+        files_output = files_input[x].replace(".jpg",".jpg.npy")
+        true_mask = np.load(path_fetch_output+files_output)
+        true_image = cv2.imread(path_fetch_input+files_input[x])
+        #Reshape to a tensor
+        true_image_pass = true_image.reshape(1,true_image.shape[0],true_image.shape[1],true_image.shape[2])
+        prediction = unet_inst.model.predict(true_image_pass, verbose = 1)
+        prediction = np.argmax(prediction, -1)
+        prediction = prediction[0,:,:]
+        if enable_debug:
+            print("------")
+            print(files_input[x])
+            print(np.unique(prediction))
+            print(np.unique(true_mask))
+            print("------")
+        prediction = prediction * scale_factor
         true_mask = true_mask * scale_factor
-        scipy.misc.imsave(path_infer_store+files[x].replace(".jpg.npy","_pred.jpg"), prediction_inst)
-        scipy.misc.imsave(path_infer_store+files[x].replace(".jpg.npy","_true.jpg"), true_mask)
+        scipy.misc.imsave(path_infer_store+files_input[x], true_image)
+        scipy.misc.imsave(path_infer_store+files_input[x].replace(".jpg","_pred.jpg"), prediction)
+        scipy.misc.imsave(path_infer_store+files_output.replace(".jpg.npy","_true.jpg"), true_mask)
