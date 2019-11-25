@@ -23,6 +23,7 @@ from keras.layers.merge import concatenate, add
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras import regularizers 
 
 class uNetModel:
     
@@ -42,13 +43,13 @@ class uNetModel:
     def conv2d_block(self, input_tensor, n_filters, kernel_size, batchnorm):
         # first layer
         x = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
-                  padding="same")(input_tensor)
+                  padding="same", kernel_regularizer=regularizers.l2(0.05), activity_regularizer=regularizers.l1(0.02))(input_tensor)
         if batchnorm:
             x = BatchNormalization()(x)
         x = Activation("relu")(x)
         # second layer
         x = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
-               padding="same")(x)
+               padding="same", activity_regularizer=regularizers.l1(0.05), kernel_regularizer = regularizers.l2(0.02))(x)
         if batchnorm:
             x = BatchNormalization()(x)
         x = Activation("relu")(x)
