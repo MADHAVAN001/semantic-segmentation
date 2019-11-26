@@ -167,5 +167,7 @@ class FCN:
 
         x = BilinearUpSampling2D(size=(32, 32))(x)
 
-        model = Model(img_input, x)
+        outputs = Conv2D(classes, (1, 1), activation='sigmoid')(x)
+        model = Model(inputs=[img_input], outputs=[outputs])
+
         return model
