@@ -63,3 +63,7 @@ def main():
         epochs=epochs,
         validation_steps=steps_per_epoch_val
     )
+
+
+if __name__ == "__main__":
+    main()
