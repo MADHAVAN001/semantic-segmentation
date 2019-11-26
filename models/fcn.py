@@ -7,7 +7,7 @@ from models.BilinearUpSampling import *
 
 class FCN:
 
-    def identity_block(self, kernel_size, filters, stage, block, weight_decay=0., momentum=0.):
+    def identity_block(self, kernel_size, filters, stage, block, weight_decay=0., momentum=0.99):
         """The identity block is the block that has no conv layer at shortcut.
         # Arguments
             input_tensor: input tensor
@@ -69,7 +69,7 @@ class FCN:
 
         return f
 
-    def convolution_block(self, kernel_size, filters, stage, block, strides=(2, 2), weight_decay=0., momentum=0.,
+    def convolution_block(self, kernel_size, filters, stage, block, strides=(2, 2), weight_decay=0., momentum=0.99,
                           epsilon=0.):
         """ Definition of Convolutional Block in a typical Resnet
         # Arguments
