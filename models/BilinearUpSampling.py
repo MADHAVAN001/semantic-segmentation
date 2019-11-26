@@ -1,6 +1,8 @@
 import keras.backend as K
 import tensorflow as tf
 from keras.layers import *
+import numpy as np
+
 
 """
 The code in this file was taken from: 
@@ -26,7 +28,7 @@ def resize_images_bilinear(X, height_factor=1, width_factor=1, target_height=Non
             new_shape = tf.shape(X)[2:]
             new_shape *= tf.constant(np.array([height_factor, width_factor]).astype('int32'))
         X = K.permute_dimensions(X, [0, 2, 3, 1])
-        X = tf.image.resize_bilinear(X, new_shape)
+        X = tf.compat.v1.image.resize_bilinear(X, new_shape)
         X = K.permute_dimensions(X, [0, 3, 1, 2])
         if target_height and target_width:
             X.set_shape((None, None, target_height, target_width))
@@ -40,7 +42,7 @@ def resize_images_bilinear(X, height_factor=1, width_factor=1, target_height=Non
         else:
             new_shape = tf.shape(X)[1:3]
             new_shape *= tf.constant(np.array([height_factor, width_factor]).astype('int32'))
-        X = tf.image.resize_bilinear(X, new_shape)
+        X = tf.compat.v1.image.resize_bilinear(X, new_shape)
         if target_height and target_width:
             X.set_shape((None, target_height, target_width, None))
         else:
