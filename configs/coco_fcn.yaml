@@ -1,0 +1,33 @@
+model:
+    arch: coco_unet
+data:
+    training:
+        dataset_dir: '/dataset/coco/train/input'
+        index_file: '/dataset/coco/train/index_file.txt'
+        labels_dir: '/dataset/coco/train/output'
+    validate:
+        dataset_dir: '/dataset/coco/validate/input'
+        index_file: '/dataset/coco/validate/index_file.txt'
+        labels_dir: '/dataset/coco/validate/output'
+    test:
+        dataset_dir: '/dataset/coco/test/input'
+        index_file: '/dataset/coco/test/index_file.txt'
+        labels_dir: '/dataset/coco/test/output'
+    classes:
+        index_file: '/dataset/coco/classMaps.json'
+    dimensions:
+        img_width: 128
+        img_height: 128
+        img_num_chans: 3
+
+training:
+    batch_size: 40
+    num_epochs: 50
+    num_filters: 16
+    dropout: 0.05
+    kernel_size: 3
+    batch_norm: True
+    model_check_path: './pretrained/fcn_weights.h5'
+
+validate:
+    batch_size: 40
