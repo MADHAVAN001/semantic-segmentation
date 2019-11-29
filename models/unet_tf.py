@@ -28,34 +28,34 @@ from tensorflow_model_optimization.sparsity import keras as sparsity
 
 class uNetModel:
     
-    def __init__(self, inputWidth, inputHeight,numChannels = 1, numClasses=13, n_filters=16, kernel_size=3, dropout = 0.05, batchnorm=True):
+    def __init__(self, inputWidth, inputHeight,numChannels = 1, numClasses=13, n_filters=16, kernel_size=3, 
+                dropout = 0.05, batchnorm=True, sparsify = False, sparsify_params = None):
         # Initialize instance
         input_img = Input((inputWidth, inputHeight, numChannels), name='img')
-        self.prune_params = {'pruning_schedule': sparsity.PolynomialDecay(initial_sparsity=0.2, final_sparsity=0.6,begin_step=30000, end_step=75000, frequency=750)}
-        self.model = self.get_unet(input_img, n_filters=n_filters, ksize = kernel_size, dropout=dropout, batchnorm=batchnorm, numClasses=numClasses)
-    
-    def argmax_op(self, input):
-        return(tf.keras.backend.cast(tf.keras.backend.argmax(input,-1),'float64'))
+        self.set_pruning = sparsify
+        if sparsify == True:
+            self.prune_params = {'pruning_schedule': sparsity.PolynomialDecay(initial_sparsity=sparsify_params[0], 
+                                final_sparsity=sparsify_params[1],begin_step=sparsify_param[2], 
+                                end_step=sparsify_params[3], frequency=sparsify_params[4])}
 
-    def softargmax(self, x, beta=1e3):
-        #x = tf.convert_to_tensor(x)
-        x_range = tf.range(x.shape.as_list()[-1], dtype=x.dtype)
-        return tf.reduce_sum(tf.nn.softmax(x*beta) * x_range, axis=-1)
+        self.model = self.get_unet(input_img, n_filters=n_filters, ksize = kernel_size, dropout=dropout, 
+                                    batchnorm=batchnorm, numClasses=numClasses)
     
     def conv2d_block(self, input_tensor, n_filters, kernel_size, batchnorm):
-        # first layer
-        prune_prm = self.prune_params
-        x = sparsity.prune_low_magnitude(Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
-        #          padding="same", kernel_regularizer=regularizers.l2(0.05), activity_regularizer=regularizers.l1(0.02)), **prune_prm)
-                  padding="same"), **prune_prm)
+        if self.set_pruning == True:
+            prune_prm = self.prune_params
+        x = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",padding="same")
+        if self.set_pruning == True:
+            x =  sparsity.prune_low_magnitude(x, **prune_prm)
         x = x(input_tensor)
         if batchnorm:
             x = BatchNormalization()(x)
         x = Activation("relu")(x)
-        # second layer
-        x2 = sparsity.prune_low_magnitude(Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
-        #       padding="same", activity_regularizer=regularizers.l1(0.05), kernel_regularizer = regularizers.l2(0.02)), **prune_prm)
-               padding="same"), **prune_prm)
+        
+        x2 = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
+               padding="same")
+        if self.set_pruning == True:
+            x2 =  sparsity.prune_low_magnitude(x2, **prune_prm)
         x = x2(x)
         if batchnorm:
             x = BatchNormalization()(x)
