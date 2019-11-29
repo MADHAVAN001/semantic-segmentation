@@ -53,8 +53,10 @@ def get_super_class(cfg):
     class_superclass_map_name = {}
     class_superclass_map_id = {}
     lencat = len(data)
+    class_name = []
     for x in range(lencat):
         supercat = data[x]['supercategory']
+        class_name.append(data[x]['name'])
         if not supercat in supercat_names.keys():
             supercat_names[supercat] = []
             supercat_ids[supercat] = []
@@ -71,7 +73,7 @@ def get_super_class(cfg):
     #Override for now due to bug in code to generate mask. Once fixed, below line can be removed
     #TODO: Run regeneration of mask and then remove below line
     final_list_supercat = ['background', 'appliance', 'electronic', 'accessory', 'kitchen', 'sports', 'vehicle', 'furniture', 'food', 'outdoor', 'indoor', 'animal', 'person']
-    return final_list_supercat
+    return final_list_supercat, class_name
 
 def get_model_hyperparams(cfg):
     
