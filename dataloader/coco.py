@@ -3,7 +3,7 @@ import os
 
 import cv2
 import numpy as np
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
 
 import utils.prefixer
 from utils.file_utils import file_line_count
@@ -74,12 +74,20 @@ def get_super_class(cfg):
     return final_list_supercat
 
 def get_model_hyperparams(cfg):
+    
     n_epochs = cfg["training"]["num_epochs"]
     n_filters = cfg["training"]["num_filters"]
     dropout = cfg["training"]["dropout"]
     kernel_size = cfg["training"]["kernel_size"]
     batch_norm = cfg["training"]["batch_norm"]
-    return n_epochs, n_filters, dropout, kernel_size, batch_norm
+    set_sparse = cfg["training"]["sparsify"]
+    sparsify_params = []
+    sparsify_params.append(cfg["training"]["initial_sparse"]
+    sparsify_params.append(cfg["training"]["final_sparse"])
+    sparsify_params.append(cfg["training"]["initial_sparse_step"])
+    sparsify_params.append(cfg["training"]["final_sparse_step"])
+    sparsify_params.append(cfg["training"]["sparse_freq"])
+    return n_epochs, n_filters, dropout, kernel_size, batch_norm, set_sparse, sparsify_params
 
 def get_model_check_path(cfg):
     return cfg["training"]["model_check_path"]
