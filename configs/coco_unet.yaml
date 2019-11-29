@@ -4,11 +4,11 @@ data:
     training:
         dataset_dir: '/dataset/coco/train/input'
         index_file: '/dataset/coco/train/index_file.txt'
-        labels_dir: '/dataset/coco/train/output'
+        labels_dir: '/dataset/coco/train/output2'
     validate:
         dataset_dir: '/dataset/coco/validate/input'
         index_file: '/dataset/coco/validate/index_file.txt'
-        labels_dir: '/dataset/coco/validate/output'
+        labels_dir: '/dataset/coco/validate/output2'
     test:
         dataset_dir: '/dataset/coco/test/input'
         index_file: '/dataset/coco/test/index_file.txt'
@@ -21,13 +21,19 @@ data:
         img_num_chans: 3
 
 training:
-    batch_size: 40
+    batch_size: 15
     num_epochs: 50
-    num_filters: 16
+    num_filters: 128
     dropout: 0.05
     kernel_size: 3
     batch_norm: True
-    model_check_path: './pretrained/sem_seg_unet.h5'
+    model_check_path: './pretrained/sem_seg_unet_full_80.h5'
+    sparsify: True
+    initial_sparse: 0.0
+    final_sparse: 0.60
+    initial_sparse_step: 30000
+    final_sparse_step: 75000
+    sparse_freq: 100
 
 validate:
-    batch_size: 40
+    batch_size: 15
