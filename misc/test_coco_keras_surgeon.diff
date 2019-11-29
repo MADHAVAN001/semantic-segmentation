@@ -1,0 +1,71 @@
+diff --git a/test_coco.py b/test_coco.py
+index 9d2b697..e6e2bce 100644
+--- a/test_coco.py
++++ b/test_coco.py
+@@ -23,7 +23,7 @@ epochs, nfilters, dropout, kernel_size, batch_norm = dataloader.coco.get_model_h
+ img_width, img_height, n_chan = data_gen_train.image_width, data_gen_train.image_height, data_gen_train.image_num_chans
+ 
+ wt_path = dataloader.coco.get_model_check_path(cfg)
+-
++wt_path = "./pretrained/sem_seg_unet_2019_11_23_Acc_82.h5"
+ num_train  = data_gen_train.num_images
+ num_valid =  data_gen_valid.num_images
+ batch_size = data_gen_train.batch_size
+@@ -36,7 +36,7 @@ unet_inst = models.unet.uNetModel(img_width, img_height, n_chan, num_classes, nf
+ unet_inst.model.compile(optimizer = Adam(), loss = "sparse_categorical_crossentropy",metrics=["sparse_categorical_accuracy"])
+ 
+ train = False
+-inference = True
++inference = False
+ eval_validation = False
+ use_test = False
+ start_inference = 0
+@@ -56,6 +56,48 @@ if train:
+                                             validation_data = data_gen_valid, callbacks = callbacks, 
+                                             epochs = epochs, validation_steps = steps_per_epoch_val)
+ 
++
++
++unet_inst.model.load_weights(wt_path)
++import matplotlib.pyplot as plt
++w1 = unet_inst.model.layers[1].get_weights()[0]
++w2 = unet_inst.model.layers[4].get_weights()[0]
++w3 = unet_inst.model.layers[9].get_weights()[0]
++
++conv_layer_weights = [w1,w2,w3]
++
++for i in range(len(conv_layer_weights)):
++    weight = conv_layer_weights[i]
++    weights_dict = {}
++    num_filters = len(weight[0,0,0,:])
++    for j in range(num_filters):
++        w_s = np.sum(abs(weight[:,:,:j]))
++        filt = 'filt_{}'.format(j)
++        weights_dict[filt] = w_s
++    weights_dict_sort = sorted(weights_dict.items(), key = lambda kv : kv[1])
++    print('L1 norm conv layer {}\n'.format(i+1),weights_dict_sort)
++
++    weights_value =[]
++    for elem in weights_dict_sort:
++        weights_value.append(elem[1])
++    xc = range(num_filters)
++
++    plt.figure(i+1,figsize=(7,5))
++    plt.plot(xc,weights_value)
++    plt.title('conv layer {}'.format(i+1))
++    plt.grid(True)
++    plt.style.use('classic')
++    plt.show()
++
++
++from kerassurgeon import identify
++from kerassurgeon.operations import delete_channels, delete_layer
++
++layer_0 = unet_inst.model.layers[1]
++
++model_new = delete_channels(unet_inst.model, layer_0, [6,8,9,12])
++model_new.compile(optimizer = Adam(), loss = "sparse_categorical_crossentropy",metrics=["sparse_categorical_accuracy"])
++
+ if inference:
+     unet_inst.model.load_weights(wt_path)
+     if use_test:

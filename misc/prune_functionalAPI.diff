@@ -1,0 +1,57 @@
+diff --git a/models/unet.py b/models/unet.py
+index e165471..ee909fe 100644
+--- a/models/unet.py
++++ b/models/unet.py
+@@ -23,12 +23,14 @@ from keras.layers.merge import concatenate, add
+ from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+ from keras.optimizers import Adam
+ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
++from tensorflow_model_optimization.sparsity import keras as sparsity
+ 
+ class uNetModel:
+     
+     def __init__(self, inputWidth, inputHeight,numChannels = 1, numClasses=13, n_filters=16, kernel_size=3, dropout = 0.05, batchnorm=True):
+         # Initialize instance
+         input_img = Input((inputWidth, inputHeight, numChannels), name='img')
++        self.pruning_param = {'pruning_schedule': sparsity.PolynomialDecay(initial_sparsity=0, final_sparsity=0.5,begin_step=15000, end_step=75000, frequency=100)}
+         self.model = self.get_unet(input_img, n_filters=n_filters, ksize = kernel_size, dropout=dropout, batchnorm=batchnorm, numClasses=numClasses)
+     
+     def argmax_op(self, input):
+@@ -41,14 +43,19 @@ class uNetModel:
+     
+     def conv2d_block(self, input_tensor, n_filters, kernel_size, batchnorm):
+         # first layer
++        pruning_prm = self.pruning_param
+         x = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
+-                  padding="same")(input_tensor)
++                  padding="same")
++        print(type(x))
++        x = sparsity.prune_low_magnitude(x, **pruning_prm)
++        print(type(x))
++        x = x (input_tensor)
+         if batchnorm:
+             x = BatchNormalization()(x)
+         x = Activation("relu")(x)
+         # second layer
+-        x = Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
+-               padding="same")(x)
++        x = sparsity.prune_low_magnitude(Conv2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), kernel_initializer="he_normal",
++               padding="same")(x), **pruning_prm)
+         if batchnorm:
+             x = BatchNormalization()(x)
+         x = Activation("relu")(x)
+@@ -101,13 +108,13 @@ class uNetModel:
+         model = Model(inputs=[input_img], outputs=[outputs])
+         return model
+ 
+-'''
+ uNetInst = uNetModel(inputWidth=128, inputHeight=128, numChannels=3, numClasses=13) 
+ #input_img = Input((im_height, im_width, 1), name='img')
+ #model = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
+ 
+ #model.compile(optimizer=Adam(), loss="binary_crossentropy", metrics=["accuracy"])
+ uNetInst.model.summary()
++'''
+ 
+ callbacks = [
+     EarlyStopping(patience=10, verbose=1),
