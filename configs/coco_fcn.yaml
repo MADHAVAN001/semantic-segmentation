@@ -29,5 +29,8 @@ training:
     batch_norm: True
     model_check_path: './pretrained/fcn_weights.h5'
 
+csv_logger_path: './pretrained/fcn_logger.csv'
+performance_logger_path: './pretrained/fcn_performance_logger.csv'
+
 validate:
     batch_size: 40

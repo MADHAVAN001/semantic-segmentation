@@ -1,8 +1,9 @@
 import yaml
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 from keras.optimizers import Adam
 
 import dataloader.coco
+from utils.performance import PerformanceMetrics
 import models.fcn
 
 
@@ -50,7 +51,9 @@ def main():
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=True, save_weights_only=True)
+        ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=True, save_weights_only=True),
+        CSVLogger(cfg["csv_logger_path"]),
+        PerformanceMetrics(cfg["performance_logger_path"])
     ]
 
     results = model.fit_generator(

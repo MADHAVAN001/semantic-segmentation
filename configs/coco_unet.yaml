@@ -29,5 +29,8 @@ training:
     batch_norm: True
     model_check_path: './pretrained/sem_seg_unet.h5'
 
+csv_logger_path: './pretrained/semantic_segmentation_logger.csv'
+performance_logger_path: './pretrained/semantic_segmentation_performance_logger.csv'
+
 validate:
     batch_size: 40
