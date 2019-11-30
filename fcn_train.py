@@ -64,11 +64,11 @@ def main():
         metrics=["sparse_categorical_accuracy"]
     )
 
-    model_path = checkpoint_path + "fcn_weights-{epoch:02d}-{val_acc:.2f}.h5"
+    model_path = checkpoint_path + "fcn_weights-{epoch:02d}-{val_sparse_categorical_accuracy:.2f}.h5"
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=False, save_weights_only=True),
+        ModelCheckpoint(model_path, verbose=1, save_best_only=False, save_weights_only=True),
         CSVLogger(cfg["csv_logger_path"]),
         PerformanceMetrics(cfg["performance_logger_path"]),
         sparsity.UpdatePruningStep(),
