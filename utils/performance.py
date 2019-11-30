@@ -1,4 +1,3 @@
-import io
 import time
 
 import numpy as np
@@ -13,10 +12,7 @@ class PerformanceMetrics(Callback):
         self.filename = filename
         self.append = append
         self.start_train_time = None
-        self.csv_file = None
-
-    def on_train_begin(self, logs=None):
-        self.csv_file = open(self.filename, 'w')
+        self.headers()
 
     def headers(self):
         row = list()
@@ -26,7 +22,8 @@ class PerformanceMetrics(Callback):
         row.append("total_parameters")
         row.append("epoch_training_time")
 
-        self.csv_file.write(",".join(row))
+        csv_file = open(self.filename, 'w')
+        csv_file.write(",".join(row)+"\n")
 
     def on_epoch_begin(self, epoch, logs=None):
         self.start_train_time = time.time()
@@ -42,4 +39,5 @@ class PerformanceMetrics(Callback):
         row.append(str(trainable_count + non_trainable_count))
         row.append(str(time.time() - self.start_train_time))
 
-        self.csv_file.write(",".join(row))
+        csv_file = open(self.filename, 'a')
+        csv_file.write(",".join(row)+"\n")
