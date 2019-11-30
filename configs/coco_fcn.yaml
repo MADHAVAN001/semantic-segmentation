@@ -27,7 +27,7 @@ training:
     dropout: 0.05
     kernel_size: 3
     batch_norm: True
-    model_check_path: './pretrained/fcn_weights.h5'
+    model_check_path: './pretrained/'
     sparsify: True
     initial_sparse: 0.0
     final_sparse: 0.60
