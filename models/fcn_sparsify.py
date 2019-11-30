@@ -133,12 +133,12 @@ class FCN:
             x = Activation('relu')(x)
 
             convolution_layer = Conv2D(filters2, kernel_size, strides=strides, padding='same', use_bias=False,
-                       kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay))(x)
+                       kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay))
 
             if self.is_pruning_enabled:
                 convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
 
-            x = convolution_layer
+            x = convolution_layer(x)
 
             x = BatchNormalization(axis=bn_axis, momentum=momentum)(x)
             x = Activation('relu')(x)

@@ -54,7 +54,7 @@ def main():
 
     is_sparse_enabled, sparse_configs = load_config_params(cfg)
 
-    fcn = models.fcn.FCN(is_sparse_enabled, sparse_configs)
+    fcn = models.fcn_sparsify.FCN(is_sparse_enabled, sparse_configs)
 
     model = fcn.resnet50(input_shape=(img_width, img_height, channels_count), classes=classes_count)
 
