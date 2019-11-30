@@ -4,7 +4,7 @@ from tensorflow.keras.optimizers import Adam
 
 import dataloader.coco
 from utils.performance import PerformanceMetrics
-import models.fcn
+import models.fcn_sparsify
 
 
 def load_coco_dataset(cfg):
@@ -13,6 +13,19 @@ def load_coco_dataset(cfg):
     classes = dataloader.coco.get_super_class(cfg)
 
     return training_data_generator, validation_data_generator, classes
+
+
+def load_config_params(cfg):
+    set_sparse = cfg["training"]["sparsify"]
+
+    sparsify_params = list()
+    sparsify_params.append(cfg["training"]["initial_sparse"])
+    sparsify_params.append(cfg["training"]["final_sparse"])
+    sparsify_params.append(cfg["training"]["initial_sparse_step"])
+    sparsify_params.append(cfg["training"]["final_sparse_step"])
+    sparsify_params.append(cfg["training"]["sparse_freq"])
+
+    return set_sparse, sparsify_params
 
 
 def main():
@@ -38,7 +51,9 @@ def main():
     steps_per_epoch_train = train_samples_count / batch_size
     steps_per_epoch_val = validation_samples_count / batch_size
 
-    fcn = models.fcn.FCN()
+    is_sparse_enabled, sparse_configs = load_config_params(cfg)
+
+    fcn = models.fcn.FCN(is_sparse_enabled, sparse_configs)
 
     model = fcn.resnet50(input_shape=(img_width, img_height, channels_count), classes=classes_count)
 

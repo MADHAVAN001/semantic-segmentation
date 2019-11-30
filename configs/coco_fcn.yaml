@@ -28,6 +28,12 @@ training:
     kernel_size: 3
     batch_norm: True
     model_check_path: './pretrained/fcn_weights.h5'
+    sparsify: True
+    initial_sparse: 0.0
+    final_sparse: 0.60
+    initial_sparse_step: 30000
+    final_sparse_step: 75000
+    sparse_freq: 100
 
 csv_logger_path: './pretrained/fcn_logger.csv'
 performance_logger_path: './pretrained/fcn_performance_logger.csv'
