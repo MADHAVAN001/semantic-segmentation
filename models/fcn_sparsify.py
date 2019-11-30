@@ -37,30 +37,34 @@ class FCN:
             convolution_base_name = 'res' + str(stage) + block + '_branch'
             bn_base_name = 'bn' + str(stage) + block + '_branch'
 
-            x = Conv2D(
+            convolution_layer = Conv2D(
                 filters1,
                 (1, 1),
                 use_bias=False,
                 kernel_initializer='he_normal',
                 kernel_regularizer=l2(weight_decay)
-            )(input_tensor)
+            )
 
             if self.is_pruning_enabled:
-                x = sparsity.prune_low_magnitude(x, **self.prune_params)
+                convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
+
+            x = convolution_layer(input_tensor)
 
             x = BatchNormalization(axis=bn_axis, momentum=momentum)(x)
             x = Activation('relu')(x)
 
-            x = Conv2D(
+            convolution_layer = Conv2D(
                 filters2,
                 kernel_size,
                 padding='same',
                 use_bias=False,
                 kernel_initializer='he_normal',
                 kernel_regularizer=l2(weight_decay)
-            )(x)
+            )
             if self.is_pruning_enabled:
-                x = sparsity.prune_low_magnitude(x, **self.prune_params)
+                convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
+
+            x = convolution_layer(x)
 
             x = BatchNormalization(
                 axis=bn_axis,
@@ -69,15 +73,18 @@ class FCN:
 
             x = Activation('relu')(x)
 
-            x = Conv2D(
+            convolution_layer = Conv2D(
                 filters3,
                 (1, 1),
                 use_bias=False,
                 kernel_initializer='he_normal',
                 kernel_regularizer=l2(weight_decay)
-            )(x)
+            )
+
             if self.is_pruning_enabled:
-                x = sparsity.prune_low_magnitude(x, **self.prune_params)
+                convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
+
+            x = convolution_layer(x)
 
             x = BatchNormalization(axis=bn_axis, momentum=momentum)(x)
 
@@ -114,29 +121,35 @@ class FCN:
             convolution_base_name = 'res' + str(stage) + block + '_branch'
             bn_base_name = 'bn' + str(stage) + block + '_branch'
 
-            x = Conv2D(filters1, (1, 1), use_bias=False, kernel_initializer='he_normal',
-                       kernel_regularizer=l2(weight_decay))(input_tensor)
+            convolution_layer = Conv2D(filters1, (1, 1), use_bias=False, kernel_initializer='he_normal',
+                       kernel_regularizer=l2(weight_decay))
 
             if self.is_pruning_enabled:
-                x = sparsity.prune_low_magnitude(x, **self.prune_params)
+                convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
+
+            x = convolution_layer(input_tensor)
 
             x = BatchNormalization(axis=bn_axis, momentum=momentum)(x)
             x = Activation('relu')(x)
 
-            x = Conv2D(filters2, kernel_size, strides=strides, padding='same', use_bias=False,
+            convolution_layer = Conv2D(filters2, kernel_size, strides=strides, padding='same', use_bias=False,
                        kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay))(x)
 
             if self.is_pruning_enabled:
-                x = sparsity.prune_low_magnitude(x, **self.prune_params)
+                convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
+
+            x = convolution_layer
 
             x = BatchNormalization(axis=bn_axis, momentum=momentum)(x)
             x = Activation('relu')(x)
 
-            x = Conv2D(filters3, (1, 1), use_bias=False, kernel_initializer='he_normal',
-                       kernel_regularizer=l2(weight_decay))(x)
+            convolution_layer = Conv2D(filters3, (1, 1), use_bias=False, kernel_initializer='he_normal',
+                       kernel_regularizer=l2(weight_decay))
 
             if self.is_pruning_enabled:
-                x = sparsity.prune_low_magnitude(x, **self.prune_params)
+                convolution_layer = sparsity.prune_low_magnitude(convolution_layer, **self.prune_params)
+
+            x = convolution_layer(x)
 
             x = BatchNormalization(axis=bn_axis, momentum=momentum)(x)
 

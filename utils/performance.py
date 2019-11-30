@@ -16,7 +16,7 @@ class PerformanceMetrics(Callback):
         self.csv_file = None
 
     def on_train_begin(self, logs=None):
-        self.csv_file = io.open(self.filename, 'w')
+        self.csv_file = open(self.filename, 'w')
 
     def headers(self):
         row = list()

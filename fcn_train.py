@@ -5,6 +5,7 @@ from tensorflow.keras.optimizers import Adam
 import dataloader.coco
 from utils.performance import PerformanceMetrics
 import models.fcn_sparsify
+from tensorflow_model_optimization.sparsity import keras as sparsity
 
 
 def load_coco_dataset(cfg):
@@ -68,7 +69,9 @@ def main():
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
         ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=True, save_weights_only=True),
         CSVLogger(cfg["csv_logger_path"]),
-        PerformanceMetrics(cfg["performance_logger_path"])
+        PerformanceMetrics(cfg["performance_logger_path"]),
+        sparsity.UpdatePruningStep(),
+        sparsity.PruningSummaries(log_dir="/workspace/")
     ]
 
     results = model.fit_generator(
