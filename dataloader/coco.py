@@ -84,7 +84,7 @@ def get_model_hyperparams(cfg):
     batch_norm = cfg["training"]["batch_norm"]
     set_sparse = cfg["training"]["sparsify"]
     sparsify_params = []
-    sparsify_params.append(cfg["training"]["initial_sparse"]
+    sparsify_params.append(cfg["training"]["initial_sparse"])
     sparsify_params.append(cfg["training"]["final_sparse"])
     sparsify_params.append(cfg["training"]["initial_sparse_step"])
     sparsify_params.append(cfg["training"]["final_sparse_step"])

@@ -35,7 +35,7 @@ class uNetModel:
         self.set_pruning = sparsify
         if sparsify == True:
             self.prune_params = {'pruning_schedule': sparsity.PolynomialDecay(initial_sparsity=sparsify_params[0], 
-                                final_sparsity=sparsify_params[1],begin_step=sparsify_param[2], 
+                                final_sparsity=sparsify_params[1],begin_step=sparsify_params[2], 
                                 end_step=sparsify_params[3], frequency=sparsify_params[4])}
 
         self.model = self.get_unet(input_img, n_filters=n_filters, ksize = kernel_size, dropout=dropout, 

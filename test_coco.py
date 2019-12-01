@@ -1,7 +1,7 @@
 import dataloader.coco
 import models.unet_tf
 import yaml 
-import utils.performance
+from utils.performance import PerformanceMetrics
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 import numpy as np
@@ -44,6 +44,7 @@ unet_inst = models.unet_tf.uNetModel(img_width, img_height, n_chan, num_classes,
                                     batch_norm, sparsify = sparsify, sparsify_params = sparsify_params)
 
 unet_inst.model.compile(optimizer = Adam(), loss = "sparse_categorical_crossentropy",metrics=["sparse_categorical_accuracy"])
+unet_inst.model.summary()
 
 train = True
 inference = False
@@ -61,6 +62,7 @@ quantize = False
 quantize_path = wt_path.replace(".h5","_full_stripped_sparse_quantized.h5")
 enable_debug = 0
 
+model_path = wt_path + "unet_weights-{epoch:02d}-{val_sparse_categorical_accuracy:.2f}.h5"
 if train:
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
@@ -92,7 +94,7 @@ if inference:
                 (os.path.getsize(full_striped_model_path) / float(2**20)))
         print("Size of the pruned model after compression: %.2f Mb" % 
                 (os.path.getsize(zip2) / float(2**20)))
-   if quantize: 
+    if quantize: 
         converter = tf.lite.TFLiteConverter.from_keras_model(unet_inst.model)
         converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_SIZE]
         tflite_quant_model = converter.convert()
