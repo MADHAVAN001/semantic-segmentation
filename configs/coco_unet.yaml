@@ -27,7 +27,7 @@ training:
     dropout: 0.05
     kernel_size: 3
     batch_norm: True
-    model_check_path: './pretrained/sem_seg_unet_with_sparsification.h5'
+    model_check_path: './pretrained/'
     sparsify: True
     initial_sparse: 0.0
     final_sparse: 0.60
@@ -37,3 +37,7 @@ training:
 
 validate:
     batch_size: 40
+
+csv_logger_path: './pretrained/unet_logger.csv'
+performance_logger_path: './pretrained/unet_performance_logger.csv'
+

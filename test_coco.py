@@ -1,8 +1,9 @@
 import dataloader.coco
 import models.unet_tf
 import yaml 
+import utils.performance
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 import numpy as np
 import scipy.misc
 import os
@@ -66,6 +67,8 @@ if train:
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
         ModelCheckpoint(wt_path, verbose=1, save_best_only=True, save_weights_only=True),
         sparsity.UpdatePruningStep(),
+        CSVLogger(cfg["csv_logger_path"]),
+        PerformanceMetrics(cfg["performance_logger_path"]),
         sparsity.PruningSummaries(log_dir=pruning_summaries_dir)
     ]
 
