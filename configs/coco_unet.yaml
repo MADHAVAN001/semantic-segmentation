@@ -21,6 +21,7 @@ data:
         img_num_chans: 3
 
 training:
+    use_super_class: True
     batch_size: 40
     num_epochs: 50
     num_filters: 16

@@ -21,11 +21,11 @@ data_gen_train = dataloader.coco.CocoDataGenerator(cfg, "train")
 data_gen_valid = dataloader.coco.CocoDataGenerator(cfg, "validate")
 
 classes, class_names = dataloader.coco.get_super_class(cfg)
-num_classes = len(classes)
+num_classes = len(class_names)
 
 #TODO: Add condition here to see if to categorize by superclass or class
-if True:
-    num_classes = len(class_names)
+if cfg["training"]["use_super_class"]:
+    num_classes = len(classes)
 
 epochs, nfilters, dropout, kernel_size, batch_norm, sparsify, sparsify_params = dataloader.coco.get_model_hyperparams(cfg)
 
@@ -55,6 +55,8 @@ end_inference = 100
 path_infer_store = "./predict/"
 pruning_summaries_dir = "./workspace/"
 scale_factor = math.floor((255.0 / num_classes))
+model_path = wt_path + "unet_weights-{epoch:02d}-{val_sparse_categorical_accuracy:.2f}.h5"
+wt_path = model_path
 full_model_path = wt_path.replace(".h5","_full.h5")
 full_striped_model_path = wt_path.replace(".h5","_full_stripped_sparse.h5")
 size_compare = False
@@ -62,12 +64,11 @@ quantize = False
 quantize_path = wt_path.replace(".h5","_full_stripped_sparse_quantized.h5")
 enable_debug = 0
 
-model_path = wt_path + "unet_weights-{epoch:02d}-{val_sparse_categorical_accuracy:.2f}.h5"
 if train:
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint(wt_path, verbose=1, save_best_only=True, save_weights_only=True),
+        ModelCheckpoint(wt_path, verbose=1, save_best_only=False, save_weights_only=True),
         sparsity.UpdatePruningStep(),
         CSVLogger(cfg["csv_logger_path"]),
         PerformanceMetrics(cfg["performance_logger_path"]),
@@ -77,7 +78,7 @@ if train:
     results = unet_inst.model.fit_generator(data_gen_train, initial_epoch=0, verbose = 1, steps_per_epoch = steps_per_epoch_train, 
                                             validation_data = data_gen_valid, callbacks = callbacks, 
                                             epochs = epochs, validation_steps = steps_per_epoch_val)
-unet_inst.model.load(weights(wt_path))
+#unet_inst.model.load(wt_path)
 tf.keras.models.save_model(unet_inst.model, full_model_path, include_optimizer=False)
 
 if inference:
