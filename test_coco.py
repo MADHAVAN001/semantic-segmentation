@@ -2,7 +2,7 @@ import dataloader.coco
 import models.unet
 import yaml 
 from keras.optimizers import Adam
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 import numpy as np
 import scipy.misc
 import os
@@ -49,7 +49,8 @@ if train:
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint(wt_path, verbose=1, save_best_only=True, save_weights_only=True)
+        ModelCheckpoint(wt_path, verbose=1, save_best_only=True, save_weights_only=True),
+        CSVLogger(cfg["training"]["csv_logger_path"])
     ]
 
     results = unet_inst.model.fit_generator(data_gen_train, initial_epoch=0, verbose = 1, steps_per_epoch = steps_per_epoch_train, 

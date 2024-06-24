@@ -1,6 +1,6 @@
-from keras.backend import image_data_format
-from keras.models import Model
-from keras.regularizers import l2
+from tensorflow.keras.backend import image_data_format
+from tensorflow.keras.models import Model
+from tensorflow.keras.regularizers import l2
 
 from models.BilinearUpSampling import *
 

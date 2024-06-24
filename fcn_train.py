@@ -1,9 +1,11 @@
 import yaml
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, CSVLogger
+from tensorflow.keras.optimizers import Adam
 
 import dataloader.coco
-import models.fcn
+from utils.performance import PerformanceMetrics
+import models.fcn_sparsify
+from tensorflow_model_optimization.sparsity import keras as sparsity
 
 
 def load_coco_dataset(cfg):
@@ -12,6 +14,19 @@ def load_coco_dataset(cfg):
     classes = dataloader.coco.get_super_class(cfg)
 
     return training_data_generator, validation_data_generator, classes
+
+
+def load_config_params(cfg):
+    set_sparse = cfg["training"]["sparsify"]
+
+    sparsify_params = list()
+    sparsify_params.append(cfg["training"]["initial_sparse"])
+    sparsify_params.append(cfg["training"]["final_sparse"])
+    sparsify_params.append(cfg["training"]["initial_sparse_step"])
+    sparsify_params.append(cfg["training"]["final_sparse_step"])
+    sparsify_params.append(cfg["training"]["sparse_freq"])
+
+    return set_sparse, sparsify_params
 
 
 def main():
@@ -37,7 +52,9 @@ def main():
     steps_per_epoch_train = train_samples_count / batch_size
     steps_per_epoch_val = validation_samples_count / batch_size
 
-    fcn = models.fcn.FCN()
+    is_sparse_enabled, sparse_configs = load_config_params(cfg)
+
+    fcn = models.fcn_sparsify.FCN(is_sparse_enabled, sparse_configs)
 
     model = fcn.resnet50(input_shape=(img_width, img_height, channels_count), classes=classes_count)
 
@@ -47,10 +64,15 @@ def main():
         metrics=["sparse_categorical_accuracy"]
     )
 
+    model_path = checkpoint_path + "fcn_weights-{epoch:02d}-{val_sparse_categorical_accuracy:.2f}.h5"
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=True, save_weights_only=True)
+        ModelCheckpoint(model_path, verbose=1, save_best_only=False, save_weights_only=True),
+        CSVLogger(cfg["csv_logger_path"]),
+        PerformanceMetrics(cfg["performance_logger_path"]),
+        sparsity.UpdatePruningStep(),
+        sparsity.PruningSummaries(log_dir="/workspace/")
     ]
 
     results = model.fit_generator(

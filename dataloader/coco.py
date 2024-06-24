@@ -3,7 +3,7 @@ import os
 
 import cv2
 import numpy as np
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
 
 import utils.prefixer
 from utils.file_utils import file_line_count
